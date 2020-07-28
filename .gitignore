@@ -1,0 +1,14 @@
+__pycach__/
+
+# C extensions
+*.so
+
+# Distribution/packaging
+.Python
+env/
+bin/
+build/
+dist/
+lib/
+lib64/
+var/
