@@ -5,9 +5,54 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Sistema multimodal para detecção de emoções</title>
+    <link rel="stylesheet" href="../public/tailwind.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-<h1>Emotion Recognition System</h1>
+<div class="flex flex-col content-center flex-wrap h-screen justify-center">
+    <div class="flex flex-col flex-wrap content-center w-screen">
+        <div class="w-2/3">
+            <p class="text-base">
+                Este é um sistema desenvolvido como trabalho de conclusão do curso de Engenharia de Computação, na Universidade
+                Estadual de Ponta Grossa, pelo aluno Mateus Felipe da Silva Junges, sob a orientação do professor Alceu Britto
+                e co-orientação do professor Luciano José Senger.
+            </p>
+            <br>
+            <p>
+                Para começar, selecione o arquivo de vídeo a ser analisado no seu computador. Como resultado, será retornado a emoção
+                presente no vídeo, baseando-se na análise do apenas do áudio, dos frames extraídos do vídeo e também com a combinação
+                das duas análises anteriores.
+            </p>
+        </div>
+    </div>
+    <div class="flex flex-col content-center flex-wrap w-screen justify-center mt-12">
+        <label class="px-12 py-8 border border-2 border-blue-300 rounded-full w-2/3 text-xl cursor-pointer flex justify-between">
+            <div>
+                <i class="fa fa-video-camera text-gray-600" aria-hidden="true"></i>
+                <span class="mt-2 text-base leading-normal text-gray-600">Selecione o arquivo de vídeo</span>
+            </div>
+            <input id="file" type="file" class="hidden" onchange="getFilename()">
+            <span class="mt-2 text-base leading-normal text-gray-600" id="selected-file"></span>
+        </label>
+        <div class="flex flex-col content-end align-middle flex-wrap">
+            <button class="right-0 w-2/3
+            bg-blue-300 px-4 py-6 rounded-full
+            text-xl mt-4 right-0 outline-none focus:outline-none">
+                Começar...
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+    function getFilename() {
+        let filename = document.getElementById('file').value;
+
+        filename = filename.split('\\');
+        filename = filename[filename.length - 1];
+
+        document.querySelector('#selected-file').innerHTML = filename;
+    }
+</script>
 </body>
 </html>

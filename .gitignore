@@ -12,3 +12,4 @@ dist/
 lib/
 lib64/
 var/
+node_modules
