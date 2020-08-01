@@ -4,11 +4,13 @@ from PIL import Image
 from cv2 import cvtColor
 from cv2 import COLOR_BGR2RGB
 from cv2 import destroyAllWindows
+import os
 
 
 def extract_video_frames(path_to_video, save_frames_to, framerate=None):
     i = 1
-
+    if not os.path.exists(save_frames_to):
+        os.makedirs(save_frames_to)
     cap = VideoCapture(path_to_video)
 
     while cap.isOpened():
@@ -27,3 +29,4 @@ def extract_video_frames(path_to_video, save_frames_to, framerate=None):
         i += 1
     cap.release()
     destroyAllWindows()
+    return save_frames_to

@@ -21,7 +21,7 @@ class FaceEmotionRecognition:
         return self._emotions.get(key, "Emoção não encontrada")
 
     def face_detector(self, frame, shape_x=48, shape_y=48):
-        cascade_classifier_path = "../models/cascade-classifier.xml"
+        cascade_classifier_path = "models/cascade-classifier.xml"
         face_cascade = cv2.CascadeClassifier(cascade_classifier_path)
         bgr2gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         detected_faces = face_cascade.detectMultiScale(bgr2gray, scaleFactor=1.1, minNeighbors=6,
