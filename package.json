@@ -21,7 +21,7 @@
     "build": "webpack -p --progress --config webpack.config.js",
     "dev-build": "webpack --progress -d --config webpack.config.js",
     "watch": "webpack --progress -d --config webpack.config.js --watch",
-    "css": "postcss assets/css/tailwind.css -o public/tailwind.css"
+    "css": "postcss assets/css/tailwind.css -o static/tailwind.css"
   },
   "repository": {
     "type": "git",

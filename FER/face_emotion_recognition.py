@@ -54,19 +54,3 @@ class FaceEmotionRecognition:
             new_face.append(face)
 
         return new_face
-
-    def predict(self, face):
-        with open('./../models/model-fer.json', 'r') as file:
-            json = file.read()
-        model = model_from_json(json)
-
-        model.load_weights('../models/model-fer-weights.h5')
-        print("Modelo carregado!")
-
-        for face in self.extract_features_from_face(self.face_detector(face)):
-            to_predict = np.reshape(face.flatten(), (1, 48, 48, 1))
-            emotions = model.predict(to_predict)
-            print(emotions)
-
-            emotion = np.argmax(emotions)
-            return self.get_emotion_name(emotion)
