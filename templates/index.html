@@ -27,19 +27,23 @@
         </div>
     </div>
     <div class="mt-12">
-        <form action="{{ url_for('analyse') }}" class="flex flex-col content-center flex-wrap w-screen justify-center">
+        <form action="{{ url_for('analyse') }}"
+              enctype="multipart/form-data"
+              method="post"
+              class="flex flex-col content-center flex-wrap w-screen justify-center">
             <label class="px-12 py-8 border border-2 border-blue-300 rounded-full w-2/3 text-xl cursor-pointer flex justify-between">
                 <div>
                     <i class="fa fa-video-camera text-gray-600" aria-hidden="true"></i>
                     <span class="mt-2 text-base leading-normal text-gray-600">Selecione o arquivo de vídeo</span>
                 </div>
-                <input id="file" type="file" class="hidden" onchange="getFilename()">
+                <input id="file" type="file" class="hidden" name="file" onchange="getFilename()">
                 <span class="mt-2 text-base leading-normal text-gray-600" id="selected-file"></span>
             </label>
             <div class="flex flex-col content-end align-middle flex-wrap">
                 <button class="right-0 w-2/3
-                bg-blue-300 px-4 py-6 rounded-full
-                text-xl mt-4 right-0 outline-none focus:outline-none">
+                        bg-blue-300 px-4 py-6 rounded-full
+                        text-xl mt-4 right-0 outline-none focus:outline-none"
+                    type="submit">
                     Começar...
                 </button>
             </div>

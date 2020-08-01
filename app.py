@@ -5,6 +5,7 @@ from flask import request
 from flask import redirect
 from flask import flash
 from flask import Response
+import os
 from SER.speech_emotion_recognition import SpeechEmotionRecognition
 from AudioExtraction.audio_extraction import extract_video_audio
 
@@ -23,14 +24,18 @@ def analyse():
     step = 1
     sample_rate = 16000
 
-    # Analise das emoções através do audio
+    # Upload do arquivo de vídeo selecionado
+    file = request.files['file']
+    file_extension = file.filename.split('.')[-1]
+    video_path = 'uploads' + '/' + 'video.' + file_extension
+    file.save(video_path)
+
 
     # Extrair o áudio do vídeo enviado:
-    # extract_video_audio()
+    audio_path = extract_video_audio(video_path, 'extracted-audios/')
 
     SER = SpeechEmotionRecognition('models/audio-emotion-recognition-model.hdf5')
-    # emotions, timestamp = SER.predict_emotion_from_file('./test/03-01-03-02-01-02-07.wav', predict_proba=True)
-    emotions, timestamp = SER.predict_emotion_from_file('./test/03-01-02-02-01-02-21.wav', predict_proba=True)
+    emotions, timestamp = SER.predict_emotion_from_file(audio_path, predict_proba=True)
 
     predictions_from_audio = {
         'angry': '{:f}'.format(emotions[0][0]),
@@ -42,10 +47,10 @@ def analyse():
         'surprise': '{:f}'.format(emotions[0][6])
     }
 
+    os.remove(video_path)
+    os.remove(audio_path)
 
-
-
-    return predict
+    return predictions_from_audio
 
 
 if __name__ == "__main__":
