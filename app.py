@@ -47,6 +47,9 @@ def analyse():
     print("\n\n\n\n" + audio_path)
     emotions, timestamp = SER.predict_emotion_from_file(audio_path, predict_proba=True)
 
+    emotion = np.argmax(emotions)
+    print("Emoção audio: " + str(SER.get_emotion_label(emotion)))
+
     predictions_from_audio = {
         'angry': '{:f}'.format(emotions[0][0]),
         'disgust': '{:f}'.format(emotions[0][1]),
@@ -63,6 +66,8 @@ def analyse():
     model = model_from_json(json)
     model.load_weights('models/model-fer-weights.h5')
 
+    angry, disgust, fear, happy, sad, surprise, neutral = [], [], [], [], [], [], []
+
     for frame in os.listdir(frames_path):
 
         FER = FaceEmotionRecognition()
@@ -71,47 +76,45 @@ def analyse():
 
         face = cv2.imread(image_to_predict)
         predictions = []
-        angry, disgust, fear, happy, sad, surprise, neutral = [], [], [], [], [], [], []
+
         for face in FER.extract_features_from_face(FER.face_detector(face)):
             to_predict = np.reshape(face.flatten(), (1, 48, 48, 1))
             emotions = model.predict(to_predict)
 
-            angry.append(emotions[0][0].astype(float))
-            disgust.append(emotions[0][1].astype(float))
-            fear.append(emotions[0][2].astype(float))
-            happy.append(emotions[0][3].astype(float))
-            sad.append(emotions[0][4].astype(float))
-            surprise.append(emotions[0][5].astype(float))
-            neutral.append(emotions[0][6].astype(float))
+            angry.append(float('{:f}'.format(emotions[0][0])))
+            disgust.append(float('{:f}'.format(emotions[0][1])))
+            fear.append(float('{:f}'.format(emotions[0][2])))
+            happy.append(float('{:f}'.format(emotions[0][3])))
+            sad.append(float('{:f}'.format(emotions[0][4])))
+            surprise.append(float('{:f}'.format(emotions[0][5])))
+            neutral.append(float('{:f}'.format(emotions[0][6])))
 
             prediction = np.argmax(emotions)
             predictions.append(prediction)
 
+            emotion = np.argmax(emotions)
 
-        predictions_from_frame = {
-            'angry': '{:f}'.format(emotions[0][0]),
-            'disgust': '{:f}'.format(emotions[0][1]),
-            'fear': '{:f}'.format(emotions[0][2]),
-            'happy': '{:f}'.format(emotions[0][3]),
-            'neutral': '{:f}'.format(emotions[0][4]),
-            'sad': '{:f}'.format(emotions[0][5]),
-            'surprise': '{:f}'.format(emotions[0][6])
-        }
+            print("Emoção encontrada: " + FER.get_emotion_name(emotion))
 
-        emotion = np.argmax(emotions)
-        print("Emoção encontrada: " + FER.get_emotion_name(emotion))
-
-
-
-
-
+    predictions_from_frames = {
+        'angry': sum(angry) / 100,
+        'disgust': sum(disgust) / 100,
+        'fear': sum(fear) / 100,
+        'happy': sum(happy) / 100,
+        'neutral': sum(neutral) / 100,
+        'sad': sum(sad) / 100,
+        'surprise': sum(surprise) / 100
+    }
 
     os.remove(video_path)
     os.remove(audio_path)
     for frame in os.listdir('extracted-frames/'):
         os.remove('extracted-frames/' + frame)
 
-    return predictions_from_audio
+    return {
+        'prediction_from_audio': predictions_from_audio,
+        'prediction_from_frames': predictions_from_frames,
+    }
 
 
 if __name__ == "__main__":

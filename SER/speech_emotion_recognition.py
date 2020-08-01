@@ -31,6 +31,9 @@ class SpeechEmotionRecognition:
             6: 'Surprise'
         }
 
+    def get_emotion_label(self, key):
+        return self._emotion.get(key, 'Emoção não encontrada')
+
     @staticmethod
     def mel_spectrogram(y, sr=16000, n_fft=512, win_length=256, hop_length=128, window='hamming', n_mels=128,
                         fmax=4000):
