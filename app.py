@@ -35,7 +35,6 @@ def analyse():
     video_path = 'uploads' + '/' + 'video.' + file_extension
     file.save(video_path)
 
-
     # Extrair o áudio do vídeo enviado:
     audio_path = extract_video_audio(video_path, 'extracted-audios/')
 
@@ -44,20 +43,19 @@ def analyse():
 
     # Analise do audio extraido
     SER = SpeechEmotionRecognition('models/audio-emotion-recognition-model.hdf5')
-    print("\n\n\n\n" + audio_path)
+
     emotions, timestamp = SER.predict_emotion_from_file(audio_path, predict_proba=True)
 
     emotion = np.argmax(emotions)
-    print("Emoção audio: " + str(SER.get_emotion_label(emotion)))
 
     predictions_from_audio = {
-        'angry': '{:f}'.format(emotions[0][0]),
-        'disgust': '{:f}'.format(emotions[0][1]),
-        'fear': '{:f}'.format(emotions[0][2]),
-        'happy': '{:f}'.format(emotions[0][3]),
-        'neutral': '{:f}'.format(emotions[0][4]),
-        'sad': '{:f}'.format(emotions[0][5]),
-        'surprise': '{:f}'.format(emotions[0][6])
+        'angry': "{:.2%}".format(emotions[0][0]),
+        'disgust': "{:.2%}".format(emotions[0][1]),
+        'fear': "{:.2%}".format(emotions[0][2]),
+        'happy': "{:.2%}".format(emotions[0][3]),
+        'neutral': "{:.2%}".format(emotions[0][4]),
+        'sad': "{:.2%}".format(emotions[0][5]),
+        'surprise': "{:.2%}".format(emotions[0][6])
     }
 
     # Análise dos frames extraídos
@@ -66,6 +64,7 @@ def analyse():
     model = model_from_json(json)
     model.load_weights('models/model-fer-weights.h5')
 
+    # Arrays pra salvar as probabilidades de cada emoção por frame analisado
     angry, disgust, fear, happy, sad, surprise, neutral = [], [], [], [], [], [], []
 
     for frame in os.listdir(frames_path):
@@ -97,13 +96,13 @@ def analyse():
             print("Emoção encontrada: " + FER.get_emotion_name(emotion))
 
     predictions_from_frames = {
-        'angry': sum(angry) / 100,
-        'disgust': sum(disgust) / 100,
-        'fear': sum(fear) / 100,
-        'happy': sum(happy) / 100,
-        'neutral': sum(neutral) / 100,
-        'sad': sum(sad) / 100,
-        'surprise': sum(surprise) / 100
+        'angry': "{:.2%}".format(sum(angry) / len(angry)),
+        'disgust': "{:.2%}".format(sum(disgust) / len(disgust)),
+        'fear': "{:.2%}".format(sum(fear) / len(fear)),
+        'happy': "{:.2%}".format(sum(happy) / len(happy)),
+        'neutral': "{:.2%}".format(sum(neutral) / len(neutral)),
+        'sad': "{:.2%}".format(sum(sad) / len(sad)),
+        'surprise': "{:.2%}".format(sum(surprise) / len(surprise))
     }
 
     os.remove(video_path)
@@ -111,10 +110,17 @@ def analyse():
     for frame in os.listdir('extracted-frames/'):
         os.remove('extracted-frames/' + frame)
 
-    return {
-        'prediction_from_audio': predictions_from_audio,
-        'prediction_from_frames': predictions_from_frames,
+    prediction_results = {
+        'predictions_from_audio': predictions_from_audio,
+        'predictions_from_frames': predictions_from_frames,
     }
+
+    return render_template('report.html', data=prediction_results)
+
+
+@app.route('/report', methods=['GET'])
+def report():
+    return render_template('report.html')
 
 
 if __name__ == "__main__":
