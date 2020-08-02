@@ -15,8 +15,8 @@
 <body>
     <div class="flex flex-wrap h-screen w-screen justify-between py-4 px-4">
         <div class="w-1/2 h-1/2 content-center">
-            <h1>Análise dos resultados através do áudio</h1>
-            <table class="table-auto w-2/3">
+            <h1 class="text-xl">Análise dos resultados através do áudio</h1>
+            <table class="table-auto w-2/3 mt-4">
                 <tr class="border bg-gray-100">
                     <th scope="col" class="px-4 py-2">Raiva</th>
                     <td class="border text-center">{{ data['predictions_from_audio']['angry'] }}</td>
@@ -48,8 +48,8 @@
             </table>
         </div>
         <div class="w-1/2 h-1/2 content-center">
-            <h1>Análise dos resultados através dos frames</h1>
-            <table class="table-auto w-2/3">
+            <h1 class="text-xl">Análise dos resultados através dos frames</h1>
+            <table class="table-auto w-2/3 mt-4">
                 <tr class="border bg-gray-100">
                     <th scope="col" class="px-4 py-2">Raiva</th>
                     <td class="border text-center">{{ data['predictions_from_frames']['angry'] }}</td>
