@@ -93,8 +93,6 @@ def analyse():
 
             emotion = np.argmax(emotions)
 
-            print("Emoção encontrada: " + FER.get_emotion_name(emotion))
-
     predictions_from_frames = {
         'angry': "{:.2%}".format(sum(angry) / len(angry)),
         'disgust': "{:.2%}".format(sum(disgust) / len(disgust)),
@@ -107,13 +105,15 @@ def analyse():
 
     os.remove(video_path)
     os.remove(audio_path)
-    for frame in os.listdir('extracted-frames/'):
-        os.remove('extracted-frames/' + frame)
+    # for frame in os.listdir('extracted-frames/'):
+    #     os.remove('extracted-frames/' + frame)
 
     prediction_results = {
         'predictions_from_audio': predictions_from_audio,
         'predictions_from_frames': predictions_from_frames,
     }
+
+    # return prediction_results
 
     return render_template('report.html', data=prediction_results)
 
