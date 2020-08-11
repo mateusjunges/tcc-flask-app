@@ -59,10 +59,11 @@ def analyse():
     }
 
     # Análise dos frames extraídos
-    with open('models/model-fer.json', 'r') as file:
-        json = file.read()
-    model = model_from_json(json)
-    model.load_weights('models/model-fer-weights.h5')
+    # with open('models/model1-fer.json', 'r') as file:
+    #     json = file.read()
+    # model = model_from_json(json)
+    model = create_model1()
+    model.load_weights('models/model1-fer-weights.h5')
 
     # Arrays pra salvar as probabilidades de cada emoção por frame analisado
     angry, disgust, fear, happy, sad, surprise, neutral = [], [], [], [], [], [], []
@@ -121,6 +122,63 @@ def analyse():
 @app.route('/report', methods=['GET'])
 def report():
     return render_template('report.html')
+
+
+from tensorflow.keras.models import Model as ModelTF2
+from tensorflow.keras.layers import Input as InputTF2
+from tensorflow.keras.layers import Dropout as DropoutTF2
+from tensorflow.keras.layers import Conv2D as Conv2DTF2
+from tensorflow.keras.layers import MaxPooling2D as MaxPooling2DTF2
+from tensorflow.keras.layers import BatchNormalization as BatchNormalizationTF2
+from tensorflow.keras.layers import Flatten as FlattenTF2
+from tensorflow.keras.layers import Dense as DenseTF2
+from tensorflow.keras.regularizers import l2
+
+def create_model1():
+    num_features = 64
+    width = height = 48
+    input_shape = InputTF2(shape=(48, 48, 1))
+
+    x = Conv2DTF2(num_features, kernel_size=(3, 3), activation='relu', input_shape=(width, height, 1), data_format='channels_last', kernel_regularizer=l2(0.01))(input_shape)
+    x = Conv2DTF2(num_features, kernel_size=(3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalizationTF2()(x)
+    x = MaxPooling2DTF2(pool_size=(2, 2), strides=(2, 2))(x)
+    x = DropoutTF2(0.5)(x)
+
+    x = Conv2DTF2(2*num_features, kernel_size=(3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalizationTF2()(x)
+    x = Conv2DTF2(2*num_features, kernel_size=(3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalizationTF2()(x)
+    x = MaxPooling2DTF2(pool_size=(2, 2), strides=(2, 2))(x)
+    x = DropoutTF2(0.5)(x)
+
+    x = Conv2DTF2(2*2*num_features, kernel_size=(3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalizationTF2()(x)
+    x = Conv2DTF2(2*2*num_features, kernel_size=(3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalizationTF2()(x)
+    x = MaxPooling2DTF2(pool_size=(2, 2), strides=(2, 2))(x)
+    x = DropoutTF2(0.5)(x)
+
+    x = Conv2DTF2(2*2*2*num_features, kernel_size=(3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalizationTF2()(x)
+    x = Conv2DTF2(2*2*2*num_features, kernel_size=(3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalizationTF2()(x)
+    x = MaxPooling2DTF2(pool_size=(2, 2), strides=(2, 2))(x)
+    x = DropoutTF2(0.5)(x)
+
+    x = FlattenTF2()(x)
+
+    x = DenseTF2(2*2*2*num_features, activation='relu')(x)
+    x = DropoutTF2(0.4)(x)
+    x = DenseTF2(2*2*num_features, activation='relu')(x)
+    x = DropoutTF2(0.4)(x)
+    x = DenseTF2(2*num_features, activation='relu')(x)
+    x = DropoutTF2(0.5)(x)
+
+    x = DenseTF2(7, activation='softmax')(x)
+
+    return ModelTF2(inputs=input_shape, outputs=x)
+
 
 
 if __name__ == "__main__":
