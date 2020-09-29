@@ -5,6 +5,7 @@ import wave
 import librosa
 from scipy.stats import zscore
 import tensorflow as tf
+from tensorflow.keras.models import load_model
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense, Dropout, Activation, TimeDistributed
@@ -14,12 +15,12 @@ from tensorflow.keras.layers import LSTM
 
 class SpeechEmotionRecognition:
 
-    def __init__(self, path_to_model=None):
+    def __init__(self, path_to_model=None, path_to_weights=None):
 
         # Load prediction model
         if path_to_model is not None:
-            self._model = self.build_model()
-            self._model.load_weights(path_to_model)
+            self._model = load_model(path_to_model)
+            self._model.load_weights(path_to_weights)
 
         self._emotion = {
             0: 'Angry',
@@ -123,6 +124,11 @@ class SpeechEmotionRecognition:
         # Read audio file
         y, sr = librosa.core.load(filename, sr=sample_rate, offset=0.5)
 
+        if y.shape[0] < chunk_size:
+            y_padded = np.zeros(chunk_size)
+            y_padded[:y.shape[0]] = y
+            y = y_padded
+
         # Split audio signals into chunks
         chunks = self.frame(y.reshape(1, 1, -1), chunk_step, chunk_size)
 
@@ -148,15 +154,6 @@ class SpeechEmotionRecognition:
         # Predict emotion
         if predict_proba is True:
             predict = self._model.predict(X)
-            # predict = {
-            #     'angry': predict[0],
-            #     'disgust': predict[1],
-            #     'fear': predict[2],
-            #     'happy': predict[3],
-            #     'neutral': predict[4],
-            #     'sad': predict[5],
-            #     'surprise': predict[6]
-            # }
         else:
             predict = np.argmax(self._model.predict(X), axis=1)
             predict = [self._emotion.get(emotion) for emotion in predict]

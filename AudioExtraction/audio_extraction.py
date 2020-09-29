@@ -6,7 +6,7 @@ def extract_video_audio(path_to_video, save_to):
         name = str.split(path_to_video, '/')[-1]
         name = str.split(name, '.')[0]
 
-        command = "ffmpeg -i " + path_to_video + " -ab 160k -ac 2 -ar 44100 -vn " + save_to + "audio.wav"
+        command = "ffmpeg -i " + path_to_video + " -ab 16k -ac 2 -ar 44100 -vn " + save_to + "audio.wav"
 
         # Execute conversion:
         subprocess.call(command, shell=True)

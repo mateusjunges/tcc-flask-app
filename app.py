@@ -7,6 +7,7 @@ from flask import redirect
 from flask import flash
 from flask import Response
 import os
+# from SER.speech_emotion_recognition import SpeechEmotionRecognition
 from SER.speech_emotion_recognition import SpeechEmotionRecognition
 from FER.face_emotion_recognition import FaceEmotionRecognition
 from AudioExtraction.audio_extraction import extract_video_audio
@@ -31,6 +32,7 @@ def analyse():
 
     # Upload do arquivo de vídeo selecionado
     file = request.files['file']
+    filename = file.filename
     file_extension = file.filename.split('.')[-1]
     video_path = 'uploads' + '/' + 'video.' + file_extension
     file.save(video_path)
@@ -42,9 +44,10 @@ def analyse():
     frames_path = extract_video_frames(video_path, 'extracted-frames')
 
     # Analise do audio extraido
-    SER = SpeechEmotionRecognition('models/audio-emotion-recognition-model.hdf5')
+    SER = SpeechEmotionRecognition('models/ser/best_model.hdf5', 'models/ser/model-weights.h5')
 
-    emotions, timestamp = SER.predict_emotion_from_file(audio_path, predict_proba=True)
+    emotions, timestamp = SER.predict_emotion_from_file(audio_path, predict_proba=True, chunk_step=step*sample_rate)
+
 
     emotion = np.argmax(emotions)
 
@@ -58,11 +61,13 @@ def analyse():
         'surprise': "{:.2%}".format(emotions[0][6])
     }
 
+    print(predictions_from_audio)
+
     # Análise dos frames extraídos
-    # with open('models/model1-fer.json', 'r') as file:
-    #     json = file.read()
-    # model = model_from_json(json)
-    model = create_model1()
+    with open('models/model1-fer.json', 'r') as file:
+        json = file.read()
+    model = model_from_json(json)
+    # model = create_model1()
     model.load_weights('models/model1-fer-weights.h5')
 
     # Arrays pra salvar as probabilidades de cada emoção por frame analisado
@@ -112,6 +117,7 @@ def analyse():
     prediction_results = {
         'predictions_from_audio': predictions_from_audio,
         'predictions_from_frames': predictions_from_frames,
+        'filename': filename,
     }
 
     # return prediction_results
