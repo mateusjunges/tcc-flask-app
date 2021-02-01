@@ -15,7 +15,7 @@ from FrameExtraction.image_frame_extraction import extract_video_frames
 import numpy as np
 import cv2
 from keras.models import model_from_json
-
+import operator
 
 app = Flask(__name__)
 
@@ -50,6 +50,16 @@ def analyse():
 
 
     emotion = np.argmax(emotions)
+
+    predictions_from_audio_float = {
+        'angry': emotions[0][0],
+        'disgust': emotions[0][1],
+        'fear': emotions[0][2],
+        'happy': emotions[0][3],
+        'neutral': emotions[0][4],
+        'sad': emotions[0][5],
+        'surprise': emotions[0][6]
+    }
 
     predictions_from_audio = {
         'angry': "{:.2%}".format(emotions[0][0]),
@@ -109,14 +119,59 @@ def analyse():
         'surprise': "{:.2%}".format(sum(surprise) / len(surprise))
     }
 
+    predictions_from_frames_float = {
+        'angry': sum(angry) / len(angry),
+        'disgust': sum(disgust) / len(disgust),
+        'fear': sum(fear) / len(fear),
+        'happy': sum(happy) / len(happy),
+        'neutral': sum(neutral) / len(neutral),
+        'sad': sum(sad) / len(sad),
+        'surprise': sum(surprise) / len(surprise)
+    }
+
+    predictions_with_sum = {
+        'angry': predictions_from_frames_float['angry'] + predictions_from_audio_float['angry'],
+        'disgust': predictions_from_frames_float['disgust'] + predictions_from_audio_float['disgust'],
+        'fear': predictions_from_frames_float['fear'] + predictions_from_audio_float['fear'],
+        'happy': predictions_from_frames_float['happy'] + predictions_from_audio_float['happy'],
+        'neutral': predictions_from_frames_float['neutral'] + predictions_from_audio_float['neutral'],
+        'sad': predictions_from_frames_float['sad'] + predictions_from_audio_float['sad'],
+        'surprise': predictions_from_frames_float['surprise'] + predictions_from_audio_float['surprise'],
+    }
+
+    predictions_with_product = {
+        'angry': predictions_from_frames_float['angry'] * predictions_from_audio_float['angry'],
+        'disgust': predictions_from_frames_float['disgust'] * predictions_from_audio_float['disgust'],
+        'fear': predictions_from_frames_float['fear'] * predictions_from_audio_float['fear'],
+        'happy': predictions_from_frames_float['happy'] * predictions_from_audio_float['happy'],
+        'neutral': predictions_from_frames_float['neutral'] * predictions_from_audio_float['neutral'],
+        'sad': predictions_from_frames_float['sad'] * predictions_from_audio_float['sad'],
+        'surprise': predictions_from_frames_float['surprise'] * predictions_from_audio_float['surprise'],
+    }
+
+    emotions_ptbr = {
+        'angry': 'Raiva',
+        'disgust': 'Desgosto',
+        'fear': 'Medo',
+        'happy': 'Feliz',
+        'neutral': 'Calmo',
+        'sad': 'Triste',
+        'surprise': 'Surpresa'
+    }
+
     os.remove(video_path)
     os.remove(audio_path)
-    # for frame in os.listdir('extracted-frames/'):
-    #     os.remove('extracted-frames/' + frame)
+
+    emotion_sum = emotions_ptbr[max(predictions_with_sum.items(), key=operator.itemgetter(1))[0]]
+    emotion_product = emotions_ptbr[max(predictions_with_product.items(), key=operator.itemgetter(1))[0]]
 
     prediction_results = {
         'predictions_from_audio': predictions_from_audio,
         'predictions_from_frames': predictions_from_frames,
+        'predictions_with_sum': predictions_with_sum,
+        'predictions_with_product': predictions_with_product,
+        'emotion_sum': emotion_sum,
+        'emotion_product': emotion_product,
         'filename': filename,
     }
 
