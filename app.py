@@ -74,30 +74,30 @@ def analyse():
     angry, disgust, fear, happy, sad, surprise, neutral = [], [], [], [], [], [], []
 
     for frame in os.listdir(frames_path):
+        if frame not in ['.gitkeep']:
+            FER = FaceEmotionRecognition()
 
-        FER = FaceEmotionRecognition()
+            image_to_predict = frames_path + '/' + frame
 
-        image_to_predict = frames_path + '/' + frame
+            face = cv2.imread(image_to_predict)
+            predictions = []
 
-        face = cv2.imread(image_to_predict)
-        predictions = []
+            for face in FER.extract_features_from_face(FER.face_detector(face)):
+                to_predict = np.reshape(face.flatten(), (1, 48, 48, 1))
+                emotions = model.predict(to_predict)
 
-        for face in FER.extract_features_from_face(FER.face_detector(face)):
-            to_predict = np.reshape(face.flatten(), (1, 48, 48, 1))
-            emotions = model.predict(to_predict)
+                angry.append(float('{:f}'.format(emotions[0][0])))
+                disgust.append(float('{:f}'.format(emotions[0][1])))
+                fear.append(float('{:f}'.format(emotions[0][2])))
+                happy.append(float('{:f}'.format(emotions[0][3])))
+                sad.append(float('{:f}'.format(emotions[0][4])))
+                surprise.append(float('{:f}'.format(emotions[0][5])))
+                neutral.append(float('{:f}'.format(emotions[0][6])))
 
-            angry.append(float('{:f}'.format(emotions[0][0])))
-            disgust.append(float('{:f}'.format(emotions[0][1])))
-            fear.append(float('{:f}'.format(emotions[0][2])))
-            happy.append(float('{:f}'.format(emotions[0][3])))
-            sad.append(float('{:f}'.format(emotions[0][4])))
-            surprise.append(float('{:f}'.format(emotions[0][5])))
-            neutral.append(float('{:f}'.format(emotions[0][6])))
+                prediction = np.argmax(emotions)
+                predictions.append(prediction)
 
-            prediction = np.argmax(emotions)
-            predictions.append(prediction)
-
-            emotion = np.argmax(emotions)
+                emotion = np.argmax(emotions)
 
     predictions_from_frames = {
         'angry': "{:.2%}".format(sum(angry) / len(angry)),
