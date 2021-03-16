@@ -7,7 +7,6 @@ from flask import redirect
 from flask import flash
 from flask import Response
 import os
-# from SER.speech_emotion_recognition import SpeechEmotionRecognition
 from SER.speech_emotion_recognition import SpeechEmotionRecognition
 from FER.face_emotion_recognition import FaceEmotionRecognition
 from AudioExtraction.audio_extraction import extract_video_audio
@@ -18,7 +17,6 @@ from keras.models import model_from_json
 import operator
 
 app = Flask(__name__)
-
 
 @app.route('/')
 def index():
@@ -70,8 +68,6 @@ def analyse():
         'sad': "{:.2%}".format(emotions[0][5]),
         'surprise': "{:.2%}".format(emotions[0][6])
     }
-
-    print(predictions_from_audio)
 
     # Análise dos frames extraídos
     with open('models/model1-fer.json', 'r') as file:
